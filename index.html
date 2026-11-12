@@ -392,6 +392,41 @@
 
 /* Standardized home action button widths */
 .home-actions .cta{width:min(320px,84vw);box-sizing:border-box;text-align:center;justify-content:center}
+
+/* V30: correct material image proportions in Levels 1 and 2 */
+#game .flip-category-art .material-pair>span:nth-child(2) img,
+#game .flip-category-art .material-pair>span:nth-child(2) svg{
+  transform:scale(1.65);
+  transform-origin:center;
+}
+/* Level 2: keep the tin and plastic illustrations fully inside their shared card */
+#game .items.l1 .item .material-pair{
+  width:100%;
+  height:clamp(78px,15vh,145px);
+  min-height:0;
+  gap:2%;
+  overflow:hidden;
+}
+#game .items.l1 .item .material-pair>span{
+  flex:1 1 50%;
+  width:50%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+}
+#game .items.l1 .item .material-pair img,
+#game .items.l1 .item .material-pair svg{
+  display:block;
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  flex:0 1 auto;
+  object-fit:contain;
+  transform:none;
+}
+
 </style></head><body><div id="app"><div class="stars"></div>
 <section class="screen on" id="home"><div class="top"><div class="brand">♻️ <span>WIRA</span> KITAR SEMULA</div><div class="actions"><button class="iconbtn sound" title="Muzik latar">♫ ON</button></div></div><div class="center"><div class="hero">🌍♻️🌱</div><h1>MISI WIRA<br><span style="color:#58efaf">KITAR SEMULA</span></h1><p class="subtitle">Jom asingkan bahan dan selamatkan bumi!</p><div class="home-actions"><button class="cta" id="start">▶ MULA</button><button class="cta guide-cta" id="openGuide">CARA PERMAINAN</button></div></div></section>
 <section class="screen" id="guide">
