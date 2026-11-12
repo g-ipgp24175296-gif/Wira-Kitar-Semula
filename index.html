@@ -691,12 +691,24 @@ const level3Pool=[
  {name:'Tin',kind:'foodCan',bin:'metal'},
  {name:'Plastik',kind:'bottlePlastic',bin:'metal'}
 ];
+// Pastikan bahan dipilih secara rawak tetapi tidak berulang berturut-turut terlalu kerap.
+let level3LastKind=null;
+let level3RepeatCount=0;
+function chooseLevel3Material(){
+ let choices=level3Pool.filter(d=>d.kind!==level3LastKind);
+ if(!choices.length)choices=level3Pool;
+ const picked=choices[Math.floor(Math.random()*choices.length)];
+ if(picked.kind===level3LastKind)level3RepeatCount++;
+ else level3RepeatCount=1;
+ level3LastKind=picked.kind;
+ return picked;
+}
 function updateLevel3Stage(){
  const arena=document.querySelector('#game .arena');if(!arena)return;
  arena.classList.add('level3-mode');
  if(!$('level3Stage')){
   const stage=document.createElement('div');stage.className='level3-stage';stage.id='level3Stage';
-  stage.innerHTML=`<div class="level3-head"><span class="level3-pill">LEVEL 3</span><span class="level3-clock" id="level3Clock">MASA: 01:00</span><span class="level3-pill">SKOR: <b id="level3LiveScore">0</b></span></div><div class="level3-instruction" id="level3Instruction">Gerakkan bahan ke kiri atau kanan untuk memilih tong yang betul.</div><div class="level3-bins"><div class="level3-bin paper" data-bin="paper"></div><div class="level3-bin glass" data-bin="glass"></div><div class="level3-bin metal" data-bin="metal"></div></div><div class="level3-ar-camera" id="level3CameraHost"></div>`;
+  stage.innerHTML=`<div class="level3-head"><span class="level3-pill">LEVEL 3</span><span class="level3-clock" id="level3Clock">MASA: 01:30</span><span class="level3-pill">SKOR: <b id="level3LiveScore">0</b></span></div><div class="level3-instruction" id="level3Instruction">Gerakkan bahan ke kiri atau kanan untuk memilih tong yang betul.</div><div class="level3-bins"><div class="level3-bin paper" data-bin="paper"></div><div class="level3-bin glass" data-bin="glass"></div><div class="level3-bin metal" data-bin="metal"></div></div><div class="level3-ar-camera" id="level3CameraHost"></div>`;
   arena.appendChild(stage);
   const bins=[...document.querySelectorAll('.bin')];
   const labels=[['paper','TONG BIRU'],['glass','TONG COKLAT'],['metal','TONG JINGGA']];
@@ -715,7 +727,7 @@ function setLevel3Lane(n){level3Lane=Math.max(0,Math.min(2,n));if(level3Current)
 function setLevel3LaneAtX(x){const stage=$('level3Stage');if(!stage)return;const r=stage.getBoundingClientRect();const usable=Math.max(1,r.width);setLevel3Lane(Math.floor((x-r.left)/usable*3));}
 function spawnLevel3Material(){
  if(!active||level!==3)return;
- const d=level3Pool[Math.floor(Math.random()*level3Pool.length)];level3Current=d;level3Lane=1;level3Y=0;
+ const d=chooseLevel3Material();level3Current=d;level3Lane=1;level3Y=0;
  const stage=$('level3Stage');if(!stage)return;
  const old=$('level3Falling');if(old)old.remove();
  const item=document.createElement('div');item.className='level3-falling';item.id='level3Falling';item.innerHTML=svg(d.kind)+`<strong>${d.name}</strong>`;item.style.left=((level3Lane+.5)/3*100)+'%';item.style.top='50px';stage.appendChild(item);
@@ -741,15 +753,15 @@ function level3Animate(now){
 }
 function startLevel3(){
  const arena=document.querySelector('#game .arena');arena.classList.add('level3-mode');$('game').classList.add('level3-active');
- level3Started=performance.now();level3LastFrame=0;level3Current=null;level3Y=0;level3Lane=1;level3StartScore=score;active=true;
- updateLevel3Stage();$('level3Clock').textContent='MASA: 01:00';
+ level3Started=performance.now();level3LastFrame=0;level3Current=null;level3Y=0;level3Lane=1;level3LastKind=null;level3RepeatCount=0;level3StartScore=score;active=true;
+ updateLevel3Stage();$('level3Clock').textContent='MASA: 01:30';
  spawnLevel3Material();level3Frame=requestAnimationFrame(level3Animate);
- let left=60;$('level3Clock').classList.remove('urgent');
+ let left=90;$('level3Clock').classList.remove('urgent');
  clearInterval(level3Timer);level3Timer=setInterval(()=>{left--;const m=String(Math.floor(Math.max(0,left)/60)).padStart(2,'0'),sec=String(Math.max(0,left)%60).padStart(2,'0');$('level3Clock').textContent='MASA: '+m+':'+sec;if(left<=10)$('level3Clock').classList.add('urgent');if(left<=0)finishLevel3()},1000);
 }
 function finishLevel3(){
  if(level!==3)return;active=false;$('game').classList.remove('level3-active');clearInterval(level3Timer);level3Timer=0;cancelAnimationFrame(level3Frame);level3Frame=0;level3Current=null;stopAR();const obj=$('level3Falling');if(obj)obj.remove();
- $('level3Score').textContent=(score-level3StartScore)+' MATA';$('level3Summary').textContent='Markah terkumpul keseluruhan: '+score+' mata. Anda berjaya menyelesaikan misi 4 bahan dalam masa 1 minit.';screen('level3result');sfx('level');
+ $('level3Score').textContent=(score-level3StartScore)+' MATA';$('level3Summary').textContent='Markah terkumpul keseluruhan: '+score+' mata. Anda berjaya menyelesaikan misi 4 bahan dalam masa 1 minit 30 saat.';screen('level3result');sfx('level');
 }
 
 function transition(nextLevel){
